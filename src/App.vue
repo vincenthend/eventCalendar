@@ -1,30 +1,33 @@
 <template>
     <div id="app">
-            <div class="sidebar" toggled>
-                
-            </div>
+            <sidebar></sidebar>
             <div class="status" v-if="!loaded"><div>{{this.status}}</div></div>
             <div class="workarea" v-if="loaded">
-                <DateBox v-for="data in caldata" :key="data.id" :date="data.date" :events="data.event_list"></datebox>
+                <DateBox @selectEvent="previewEvents" v-for="data in caldata" :key="data.id" :date="data.date" :events="data.event_list"></datebox>
             </div>
-            <div class="previewPane">
-            </div>
+            <Preview :toggled="preview_toggle" :event="this.selected_data"></Preview>
     </div>
 </template>
 
 <script>
 import DateBox from './components/DateBox.vue'
+import Sidebar from './components/Sidebar.vue'
+import Preview from './components/Preview.vue'
 
 export default {
     components: {
-        DateBox
+        DateBox, Sidebar, Preview
     },
     data: function() {
       return {
         status : "Loading",
         loaded : false,
         endpoint : 'https://script.google.com/macros/s/AKfycbw5wP7kczmWpK-dP4GCzrfpA1N76m6r7c5rhqxVt8jOEkDseqY/exec?method=getEventByDate&param=',
-        caldata : []
+        caldata : [],
+        toggled : true,
+
+        selected_data : {},
+        preview_toggle : true,
       }
     },
     methods: {
@@ -37,11 +40,14 @@ export default {
           if (res.status = true){
             this.caldata = res.events;
           }
-          console.log(res)
         });
+      },
+      previewEvents : function(event){
+        this.preview_toggle = false;
+        this.selected_data = event;
       }
     },
-    mounted(){
+    created(){
       this.loadEvents()
     }
 }
@@ -49,8 +55,13 @@ export default {
 
 <style>
   @font-face {
+      font-family: "FontAwesome";
+      src: url("./assets/fonts/fa-solid-900.woff") format('woff');
+  }
+
+  @font-face {
       font-family: "Product Sans";
-      src: url('../fonts/Product Sans Regular.ttf');
+      src: url('./assets/fonts/Product Sans Regular.ttf');
   }
 
   * {
@@ -58,7 +69,7 @@ export default {
   }
 
   body {
-      background-color: #ddd;
+      background-color: #EFEFEF;
       margin: 0;
   }
 
@@ -77,49 +88,25 @@ export default {
 
   @media (max-width: 575px){   
       #app {
-          display: flex;
-          flex-direction: column;
-          overflow: visible;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
       }
-      .sidebar {
-          width:100vw;
-          height:15rem;
-          margin-bottom:1rem;
-      }
-
-      .sidebar[toggled] {
-          height: 3rem;
-      }
+      
       .sidebar ~ .workarea {
-          margin-top: 3rem;
-      }
+        margin-top: 3rem;
+      }      
   }
   @media (min-width: 576px){    
       #app {
-          display: flex;
-          flex-direction: row;
-          overflow: visible;
+        display: flex;
+        flex-direction: row;
+        overflow: visible;
       }
+
       .workarea {
-          padding-left: 1rem;
+        margin-left: 3rem;
+        padding-left: 1rem;
       }
-
-      .sidebar {
-          width: 25rem;
-          height: 100vh;
-      }
-      .sidebar[toggled] {
-          width: 3rem;
-      }
-      .sidebar[toggled] ~ .workarea {
-          margin-left: 3rem;
-      }
-  }
-
-  .sidebar {
-      position: fixed;
-      z-index: 1;
-      background-color: #FFF;
-      transition-duration: 0.2s;
   }
 </style>

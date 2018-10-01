@@ -1,5 +1,5 @@
 <template>
-    <div class="event">
+    <div class="event" @click="selectEvent">
         <div class="time" v-if="!allDay">{{start}} - {{end}}</div>
         <div class="event-name">{{name}}</div>
     </div>
@@ -21,18 +21,12 @@
                 required: true
             }
         },
-        method : {
-            setData : function(event){
-                var start = new Date(event.start);
-                var end = new Date(event.end);
-
-                this.start = start.getHours() + ":" + start.getMinutes();
-                this.end = end.getHours() + ":" + end.getMinutes();
-                this.name = event.name;
+        methods : {
+            selectEvent : function(event){
+                this.$emit('selectEvent', this.event)
             }
         },
         created(){
-            console.log(this.event)
             var start = new Date(this.event.start*1000);
             var end = new Date(this.event.end*1000);
 
@@ -51,7 +45,8 @@
         padding-left: 0;
     }
 
-    .event {
+    .event {        
+        cursor: pointer;     
         display: flex;
         flex-direction: row;
         padding: 0.3rem;

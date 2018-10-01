@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="events">
-            <Event v-for="event in this.events" :key="event.id" :event="event"></event>
+            <Event @selectEvent="handleEventClick" v-for="event in this.events" :key="event.id" :event="event"></event>
         </div>
     </div>
 </template>
@@ -26,7 +26,7 @@
     export default {
         data : function(){
             return {
-                dateInterfaced : [1, "Januari", 1970],
+                dateInterfaced : ["Senin", 1, "Januari", 1970],
                 month : ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
                 day : ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
             }
@@ -43,10 +43,14 @@
         components: {
             Event
         },
+        methods: {
+            handleEventClick : function(event){
+                this.$emit('selectEvent', event)
+            }
+        },
         created(){
             var dateObj = new Date(this.date)
             this.dateInterfaced = [this.day[dateObj.getDay()], dateObj.getDate(), this.month[dateObj.getMonth()], dateObj.getYear()+1900]
-            console.log(this.events)
         }
     }
 </script>
@@ -56,6 +60,7 @@
         .datebox {        
             margin-left: 1rem;
             margin-right: 0.5rem;
+            margin-top: 1rem;
         }
     }
     @media (min-width: 576px){
